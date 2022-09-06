@@ -10,6 +10,9 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^1.0.2",
+    "ethereum-waffle": "^3.4.4",
+    "ethers": "^5.7.0",
     "hardhat": "^2.10.2"
   },
   "dependencies": {

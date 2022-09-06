@@ -88,4 +88,42 @@ contract NFTBusinessCard is ERC721URIStorage {
 
         return tokens;
     }
+
+    function getMyNFTs() public view returns (BusinessCard[] memory) {
+        uint totalItemCount = _tokenIds.current();
+        uint nftCount = 0;
+
+        for(uint i=0; i < totalItemCount; i++){
+            if(idToBusinessCard[i+1].owner == msg.sender || idToBusinessCard[i+1].seller == msg.sender){
+                nftCount+=1;
+            }
+        }
+
+        BusinessCard[] memory tokens = new BusinessCard[](nftCount);
+        for(uint i=0; i < totalItemCount; i++){
+            if (idToBusinessCard[i+1].owner == msg.sender || idToBusinessCard[i+1].seller == msg.sender){
+                BusinessCard storage currentItem = idToBusinessCard[i+1];
+                tokens[i] = currentItem;            
+            }
+        }
+        return tokens;
+    }
+
+    function executeSale(uint256 tokenId) public payable{
+        uint price = idToBusinessCard[tokenId].price;
+        require(msg.value == price, "Please submit the asking price.");
+
+        address seller = idToBusinessCard[tokenId].seller;
+
+        idToBusinessCard[tokenId].currentlyPublic = true;
+        idToBusinessCard[tokenId].seller = payable(msg.sender);
+        _itemSold.increment();
+
+        _transfer(address(this), msg.sender, tokenId);
+
+        approve(address(this), tokenId);
+
+        payable(owner).transfer(createFee);
+        payable(seller).transfer(msg.value);
+    }
 }
